@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'dalli'
 require 'representable/cache'
+require 'logger'
 
 describe "configuration" do
   context "cache engine" do
@@ -38,6 +39,12 @@ describe "configuration" do
       Representable::Cache.enable.should be_false
       Representable::Cache.enable = true
       Representable::Cache.enable.should be_true
+    end
+  end
+  context "logger" do
+    it "should support loger" do
+      Representable::Cache.logger = Logger.new(STDOUT)
+      Representable::Cache.logger.should be_kind_of Logger
     end
   end
 end

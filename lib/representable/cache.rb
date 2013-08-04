@@ -1,11 +1,13 @@
 require "representable/cache/version"
 require 'representable/binding'
+require 'benchmark'
 
 module Representable::Cache
   def self.reset
     @default_cache_key = nil
     @engine = nil
     @enable = nil
+    @logger = nil
   end
   def self.cache_engine=(engine)
     raise "engine doesn't response to get" if !engine.respond_to?(:get)
@@ -32,6 +34,14 @@ module Representable::Cache
 
   def self.cache
     @engine
+  end
+
+  def self.logger=(logger)
+    @logger = logger
+  end
+
+  def self.logger
+    @logger ||= Logger.new(STDOUT)
   end
 
   # include presenter in model
@@ -83,11 +93,19 @@ module Representable::Cache
   module InstanceMethods
     def to_hash(options={}, binding_builder=Representable::Hash::PropertyBinding)
       return super(options, binding_builder) if !Representable::Cache.enable
-      if hash = Representable::Cache.cache.get(self.representable_cache_key)
+
+      key = self.representable_cache_key
+
+      if hash = Representable::Cache.cache.get(key)
+        Representable::Cache.logger.debug "[Representable::Cache] cache hit: #{key}"
         return hash
       end
-      hash = super(options, binding_builder)
-      Representable::Cache.cache.set(self.representable_cache_key, hash)
+
+      time = Benchmark.realtime do
+        hash = super(options, binding_builder)
+      end
+      Representable::Cache.cache.set(key, hash)
+      Representable::Cache.logger.debug "[Representable::Cache] write cache: #{key} cost: #{time.to_f}"
       hash
     end
 
@@ -101,8 +119,8 @@ module Representable::Cache
       self.representable_cache_options[:cache_name] ||= self.class.name
 
       keys = [
-        self.representable_cache_options[:cache_version],
-        self.representable_cache_options[:cache_name]
+        self.representable_cache_options[:cache_name],
+        self.representable_cache_options[:cache_version]
       ]
       raise "cache_key or default_cache_key is required" if self.representable_cache_options[:cache_key].nil?
       if self.representable_cache_options[:cache_key].kind_of? Array
@@ -110,7 +128,7 @@ module Representable::Cache
           self.send(k).to_s.gsub(/\s+/,'')
         end
       else
-        self.send(self.representable_cache_options[:cache_key]).to_s.gsub(/\s+/,'')
+        keys << self.send(self.representable_cache_options[:cache_key]).to_s.gsub(/\s+/,'')
       end
       keys.compact.join("-")
     end
