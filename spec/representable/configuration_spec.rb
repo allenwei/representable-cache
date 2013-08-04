@@ -31,4 +31,13 @@ describe "configuration" do
       Representable::Cache.default_cache_key.should eq [:id, :updated_at]
     end
   end
+
+  context "enable" do
+    it "should support enable or disable it" do
+      Representable::Cache.enable = false
+      Representable::Cache.enable.should be_false
+      Representable::Cache.enable = true
+      Representable::Cache.enable.should be_true
+    end
+  end
 end

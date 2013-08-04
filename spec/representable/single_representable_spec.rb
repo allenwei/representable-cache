@@ -43,6 +43,26 @@ describe Representable::Cache do
       brand.label = "321"
       brand.representable_cache_key.should be_include("cache_name_123")
     end
+    it "should not read from cache if disable it" do
+      @Brand = Class.new(Object) do
+        include Representable::JSON
+        include Representable::Cache
+        attr_accessor :name, :label, :updated_at
+        property :name
+        property :label
+        property :updated_at
+        representable_cache :cache_key => :updated_at
+      end
+      Representable::Cache.enable = false
+      b = @Brand.new
+      b.name = "b1"
+      b.label = "l 1"
+      b.updated_at = Time.now
+      Representable::Cache.cache.set(b.representable_cache_key, {"brand" => {"name"=>"b 2", "label"=>"l 2", "updated_at"=>"2013-08-04 08:55:50 +0800"}})
+      json = b.to_json(:wrap => "brand")
+      hash = MultiJson.decode(json)
+      hash["brand"]["name"].should eq "b1"
+    end
   end
 
   context "simple representable" do

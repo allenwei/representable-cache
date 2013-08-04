@@ -26,6 +26,7 @@ Or install it yourself as:
 ```ruby
 Representable::Cache.cache_engine = Dalli::Client.new('localhost:11211', :namespace => "app_v1")
 Representable::Cache.default_cache_key = [:id, :updated_at]
+Representable::Cache.enable = false # Default: true
 ```
 
 ### Setup

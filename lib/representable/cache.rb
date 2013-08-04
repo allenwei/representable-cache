@@ -5,6 +5,7 @@ module Representable::Cache
   def self.reset
     @default_cache_key = nil
     @engine = nil
+    @enable = nil
   end
   def self.cache_engine=(engine)
     raise "engine doesn't response to get" if !engine.respond_to?(:get)
@@ -18,6 +19,15 @@ module Representable::Cache
 
   def self.default_cache_key
     @default_cache_key
+  end
+
+  def self.enable=(enable)
+    @enable = enable
+  end
+
+  def self.enable
+    return true if @enable.nil?
+    @enable
   end
 
   def self.cache
@@ -72,6 +82,7 @@ module Representable::Cache
   end
   module InstanceMethods
     def to_hash(options={}, binding_builder=Representable::Hash::PropertyBinding)
+      return super(options, binding_builder) if !Representable::Cache.enable
       if hash = Representable::Cache.cache.get(self.representable_cache_key)
         return hash
       end
