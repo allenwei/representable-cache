@@ -1,6 +1,8 @@
 # Representable::Cache
 
-TODO: Write a gem description
+provide cache feature for Representable
+
+[representable](https://github.com/apotonick/representable)
 
 ## Installation
 
@@ -18,7 +20,48 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+
+### Default Configuration
+
+```ruby
+Representable::Cache.cache_engine = Dalli::Client.new('localhost:11211', :namespace => "app_v1")
+Representable::Cache.default_cache_key = [:id, :updated_at]
+```
+
+### Setup
+
+```ruby
+require 'representable/json'
+require 'representable/cache'
+
+module SongRepresenter
+  include Representable::JSON
+  include Representable::Cache
+
+  property :title
+  property :track
+end
+```
+
+### settings
+
+```ruby
+module SongRepresenter
+  include Representable::JSON
+  include Representable::Cache
+
+  property :title
+  property :track
+  representable_cache :cache_key => :id, :cache_name => "Brand",
+:version => "v1"
+end
+```
+
+options:
+* cache_key: could be symble or array, will use default_cache_key if not
+  set
+* cache_name: default: module or class name
+* version: version name, you can invalid old cache by bump cache version
 
 ## Contributing
 
