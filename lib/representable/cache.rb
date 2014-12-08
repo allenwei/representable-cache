@@ -91,7 +91,7 @@ module Representable::Cache
     end
   end
   module InstanceMethods
-    def to_hash(options={}, binding_builder=Representable::Hash::PropertyBinding)
+    def to_hash(options={}, binding_builder=Representable::Hash::Binding)
       return super(options, binding_builder) if !Representable::Cache.enable
 
       key = self.representable_cache_key
