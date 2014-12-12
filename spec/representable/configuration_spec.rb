@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'dalli'
-require 'representable/cache'
 require 'logger'
 
 describe "configuration" do

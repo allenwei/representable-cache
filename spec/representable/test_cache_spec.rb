@@ -1,7 +1,4 @@
 require 'spec_helper'
-require 'representable'
-require 'representable/json'
-require 'representable/cache'
 require 'representable/test_cache'
 
 describe Representable::TestCache do

@@ -1,8 +1,6 @@
 require 'spec_helper'
 require 'dalli'
-require 'representable'
 require 'representable/json'
-require 'representable/cache'
 
 describe Representable::Cache do
   before do
