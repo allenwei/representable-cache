@@ -28,6 +28,26 @@ describe Representable::Cache::Key do
     it { should eq '[onetwothree]' }
   end
 
+  context "nil parameters" do
+    context "single values" do
+      let(:subject) { described_class.new(nil) }
+
+      it { should eq '[nil]' }
+    end
+
+    context "arrays" do
+      let(:subject) { described_class.new([nil, nil]) }
+
+      it { should eq '[nil]&[nil]' }
+    end
+
+    context "hashes" do
+      let(:subject) { described_class.new('nilvalue' => nil) }
+
+      it { should eq 'nilvalue=[nil]' }
+    end
+  end
+
   context "nested parameters" do
     context "sub-hash" do
       let(:subject) { described_class.new('one' => 1, 'two' => 2, 'three' => {'name' => 'three', 'value' => 3}) }

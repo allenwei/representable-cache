@@ -2,6 +2,7 @@ module Representable
   module Cache
     class Key < String
       def initialize(params)
+        params = 'nil' if params.nil?
         if params.respond_to?(:cache_key)
           super "[#{params.cache_key}]"
         elsif params.respond_to?(:keys)
